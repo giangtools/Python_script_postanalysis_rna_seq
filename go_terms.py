@@ -19,7 +19,7 @@ df['Score'] = pd.to_numeric(df['Score'], errors='coerce')
 filtered_out_df = df[df['Score'] >= 1]
 
 # Lưu các dòng có Score >= 1 vào file khác
-filtered_out_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Test/filtered_out_rows.tsv'
+filtered_out_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Res/go_terms_python/filtered_out_rows.tsv'
 filtered_out_df.to_csv(filtered_out_file_path, sep='\t', index=False)
 # Lọc bỏ các hàng có Score >= 1
 df = df[df['Score'] < 1]
@@ -56,7 +56,7 @@ df_grouped = df_filtered.groupby('pro_id').agg({
 
 
 # Lưu kết quả vào file mới nếu cần
-output_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Test/id_goterms.tsv'
+output_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Res/go_terms_python/id_goterms.tsv'
 df_grouped[['pro_id', 'GO_terms']].to_csv(output_file_path, sep='\t', index=False)
 
 # Đọc dữ liệu từ file TSV của kết quả Salmon
@@ -67,7 +67,7 @@ salmon_df = pd.read_csv(salmon_file_path, sep='\t')
 zero_filtered_df = salmon_df[(salmon_df[['Control1', 'Control2', 'Control3']] == 0).sum(axis=1).isin([1, 2])]
 
 # Lưu các dòng đã lọc vào file khác
-zero_filtered_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Test/zero_filtered_genes.tsv'
+zero_filtered_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Res/go_terms_python/zero_filtered_genes.tsv'
 zero_filtered_df.to_csv(zero_filtered_file_path, sep='\t', index=False)
 
 # Lọc bỏ các dòng có giá trị 0 ở 1 hoặc 2 lần trong ba lần lặp khỏi dataframe chính
@@ -89,7 +89,7 @@ salmon_df['id'] = salmon_df['gene_id'].apply(lambda x: x.split('-')[-1])
 salmon_df['pro_id'] = salmon_df['id']
 
 # Xuất file đầu tiên xử lý bao gồm mean, sd và độ lệch chuẩn
-output_file_path_1 = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Test/salmon_results_with_mean_sd_sv.tsv'
+output_file_path_1 = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Res/go_terms_python/salmon_results_with_mean_sd_sv.tsv'
 salmon_df_1.to_csv(output_file_path_1, sep='\t', index=False)
 
 # Loại bỏ .1 từ cột protein_id
@@ -104,6 +104,6 @@ salmon_df = salmon_df[['tx', 'gene_id', 'Control1', 'Control2', 'Control3', 'mea
 print(salmon_df)
 
 # Lưu kết quả vào file mới nếu cần
-output_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Test/salmon_results_with_go_terms.tsv'
+output_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Res/go_terms_python/salmon_results_with_go_terms.tsv'
 salmon_df.to_csv(output_file_path, sep='\t', index=False)
 
