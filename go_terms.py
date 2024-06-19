@@ -13,7 +13,14 @@ column_names = [
 ]
 
 df = pd.read_csv(file_path, sep='\t', names=column_names)
+# Chuyển đổi cột Score sang kiểu float
+df['Score'] = pd.to_numeric(df['Score'], errors='coerce')
+# Tạo DataFrame chứa các dòng có Score >= 1
+filtered_out_df = df[df['Score'] >= 1]
 
+# Lưu các dòng có Score >= 1 vào file khác
+filtered_out_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Test/filtered_out_rows.tsv'
+filtered_out_df.to_csv(filtered_out_file_path, sep='\t', index=False)
 # Lọc bỏ các hàng có Score >= 1
 df = df[df['Score'] < 1]
 
@@ -56,7 +63,15 @@ df_grouped[['pro_id', 'GO_terms']].to_csv(output_file_path, sep='\t', index=Fals
 salmon_file_path = 'd:/GD_63_analysis/salmon.merged.transcript_tpm.tsv'
 #salmon_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/salmon.merged.transcript_tpm.tsv'
 salmon_df = pd.read_csv(salmon_file_path, sep='\t')
+# Lọc các dòng có giá trị 0 ở 1 hoặc 2 lần trong ba lần lặp
+zero_filtered_df = salmon_df[(salmon_df[['Control1', 'Control2', 'Control3']] == 0).sum(axis=1).isin([1, 2])]
 
+# Lưu các dòng đã lọc vào file khác
+zero_filtered_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Test/zero_filtered_genes.tsv'
+zero_filtered_df.to_csv(zero_filtered_file_path, sep='\t', index=False)
+
+# Lọc bỏ các dòng có giá trị 0 ở 1 hoặc 2 lần trong ba lần lặp khỏi dataframe chính
+salmon_df = salmon_df[(salmon_df[['Control1', 'Control2', 'Control3']] != 0).sum(axis=1) == 3]
 # Đọc dữ liệu từ file TSV chứa id và Go_terms
 go_terms_df = pd.read_csv(output_file_path, sep='\t', header=0)
 
