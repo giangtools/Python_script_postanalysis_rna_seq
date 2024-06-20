@@ -71,7 +71,8 @@ zero_filtered_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Res/go_terms
 zero_filtered_df.to_csv(zero_filtered_file_path, sep='\t', index=False)
 
 # Lọc bỏ các dòng có giá trị 0 ở 1 hoặc 2 lần trong ba lần lặp khỏi dataframe chính
-salmon_df = salmon_df[(salmon_df[['Control1', 'Control2', 'Control3']] != 0).sum(axis=1) == 3]
+#salmon_df = salmon_df[(salmon_df[['Control1', 'Control2', 'Control3']] != 0).sum(axis=1) == 3]
+salmon_df = salmon_df[(salmon_df[['Control1', 'Control2', 'Control3']] == 0).sum(axis=1).isin([0, 3])]
 # Đọc dữ liệu từ file TSV chứa id và Go_terms
 go_terms_df = pd.read_csv(output_file_path, sep='\t', header=0)
 
