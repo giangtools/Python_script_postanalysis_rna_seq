@@ -60,7 +60,7 @@ output_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Res/go_terms_python
 df_grouped[['pro_id', 'GO_terms']].to_csv(output_file_path, sep='\t', index=False)
 
 # Đọc dữ liệu từ file TSV của kết quả Salmon
-salmon_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Data/sample_output_mergededit_unstranded/star_salmon/salmon.merged.transcript_tpm.tsv'
+salmon_file_path = 'c:\Users\ADMIN\TGiang\GD_63_Postanalysis\Data\Giang_MolBiolab_result\HP_GD63_merge_samplesheet_unstranded\star_salmon\salmon.merged.transcript_tpm.tsv'
 #salmon_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/salmon.merged.transcript_tpm.tsv'
 salmon_df = pd.read_csv(salmon_file_path, sep='\t')
 # Lọc các dòng có giá trị 0 ở 1 hoặc 2 lần trong ba lần lặp
