@@ -60,7 +60,7 @@ output_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Res/go_terms_python
 df_grouped[['pro_id', 'GO_terms']].to_csv(output_file_path, sep='\t', index=False)
 
 # Đọc dữ liệu từ file TSV của kết quả Salmon
-salmon_file_path = 'c:\Users\ADMIN\TGiang\GD_63_Postanalysis\Data\Giang_MolBiolab_result\HP_GD63_merge_samplesheet_unstranded\star_salmon\salmon.merged.transcript_tpm.tsv'
+salmon_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Data/modified/Giang_MolBiolab_result/Modified/salmon/salmon.merged.transcript_tpm.tsv'
 #salmon_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/salmon.merged.transcript_tpm.tsv'
 salmon_df = pd.read_csv(salmon_file_path, sep='\t')
 # Lọc các dòng có giá trị 0 ở 1 hoặc 2 lần trong ba lần lặp
@@ -125,6 +125,7 @@ for index, row in salmon_df.iterrows():
 # Hiển thị DataFrame sau khi đã thêm cột 'product'
 print(salmon_df)
 ######################
+
 # Kết hợp Go_terms vào kết quả Salmon
 salmon_df = salmon_df.merge(go_terms_df, on='pro_id', how='left')
 
@@ -136,3 +137,68 @@ print(salmon_df)
 output_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Res/go_terms_python_merged/salmon_results_with_go_terms.tsv'
 salmon_df.to_csv(output_file_path, sep='\t', index=False)
 
+
+
+#######################
+# Đọc file TSV chứa thông tin về preferredName
+preferred_name_file_path = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Data/data_id_stringdb/string_mapping.tsv'
+preferred_name_df = pd.read_csv(preferred_name_file_path, sep='\t')
+
+# Trích xuất phần tmp_ từ cột queryItem
+def extract_tmp_query(query_item):
+    match = re.search(r'tmp_\d+', query_item)
+    return match.group(0) if match else None
+
+preferred_name_df['tmp_id'] = preferred_name_df['queryItem'].apply(extract_tmp_query)
+
+# Trích xuất phần tmp_ từ cột tx trong salmon_df
+def extract_tmp_tx(tx):
+    match = re.search(r'tmp_\d+', tx)
+    return match.group(0) if match else None
+
+salmon_df['tmp_id'] = salmon_df['tx'].apply(extract_tmp_tx)
+
+# Merge DataFrame dựa trên cột tmp_id
+merged_df = salmon_df.merge(preferred_name_df[['tmp_id', 'preferredName']], on='tmp_id', how='left')
+
+# Hiển thị DataFrame sau khi thêm cột preferredName
+print(merged_df)
+
+# Sắp xếp lại các cột để hiển thị
+merged_df = merged_df[['tx', 'gene_id', 'Control1', 'Control2', 'Control3', 'mean', 'sd', 'S_V', 'GO_terms', 'product', 'preferredName']]
+print(merged_df)
+# Lưu kết quả vào file mới nếu cần
+#output_file_path_with_preferred_name = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Data/data_id_stringdb/salmon_results_with_go_terms_and_preferred_name.tsv'
+#merged_df.to_csv(output_file_path_with_preferred_name, sep='\t', index=False)
+#######################
+
+
+##############################################
+# Tạo một cột 'name_gff' trống trong DataFrame salmon_df
+merged_df['name_gff'] = None
+
+# Duyệt qua từng gene trong DataFrame salmon_df và trích xuất thông tin 'Name' từ file GFF
+for index, row in salmon_df.iterrows():
+    # Lấy giá trị gene_id của gene hiện tại
+    gene_id = row['gene_id']
+    
+    # Tìm thông tin về gene_id trong file GFF
+    gff_info = gff_data[gff_data['attributes'].str.contains('gene=' + gene_id)]
+    
+    # Kiểm tra nếu có ít nhất một dòng thỏa mãn điều kiện
+    if len(gff_info) > 0:
+        # Lấy giá trị 'Name' từ dòng đầu tiên thỏa mãn điều kiện
+        name_value = gff_info['attributes'].str.extract(r'Name=([^;]+);')[0].iloc[0]
+        if pd.isna(name_value):  # Xử lý trường hợp không tìm thấy giá trị 'Name'
+            name_value = 'N/A'
+    else:
+        name_value = 'N/A'
+    
+    # Gán giá trị 'Name' vào cột 'name_gff' tương ứng với gene hiện tại
+    merged_df.at[index, 'name_gff'] = name_value
+
+# Hiển thị DataFrame sau khi đã thêm cột 'name_gff' và điền giá trị
+print(merged_df)
+output_file_path_with_preferred_name = 'c:/Users/ADMIN/TGiang/GD_63_Postanalysis/Data/data_id_stringdb/salmon_results_with_preferredname_gffname.tsv'
+merged_df.to_csv(output_file_path_with_preferred_name, sep='\t', index=False)
+############################################################
